@@ -1,5 +1,7 @@
 package org.example.services;
+import netscape.javascript.JSObject;
 import org.example.clients.NewsClient;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,10 +10,12 @@ import java.awt.event.ActionListener;
 
 public class NewsService  extends JFrame {
 
+    private JTextArea resultArea;
+
     public NewsService() {
-        super ("News");
+        super ("News-Parser");
         createAndShowGUI();
-        NewsClient newsClient = new NewsClient();
+//        NewsClient newsClient = new NewsClient();
     }
 
     private void createAndShowGUI() {
@@ -35,20 +39,45 @@ public class NewsService  extends JFrame {
         searchButton.setBounds(195, 220, 100, 30);
         add(searchButton);
 
+        resultArea = new JTextArea();
+        resultArea.setEditable(false);
+        resultArea.setBounds(50, 260, 400, 180);
+        resultArea.setBackground(Color.WHITE);
+        resultArea.setForeground(Color.BLACK);
+        add(resultArea);
+
+        JScrollPane scrollPane = new JScrollPane(resultArea);
+        scrollPane.setBounds(50,260,400,180);
+        add(scrollPane);
+
+
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                String hashtagText = searchField.getText().trim();
                if(!hashtagText.isEmpty()){
- //                  String response = newsClient.getNewsByHashtag(hashtagText);
-
-
-
+                   String jsonResponse = NewsClient.getNewsByHashtag(hashtagText);
+                   if(jsonResponse != null){
+                       String formattedJson = formatJson(jsonResponse);
+                       resultArea.setText(formattedJson);
+                   }else {
+                       resultArea.setText("No information found");
+                   }
                }
-
             }
         });
-
     }
 
+    private String formatJson(String jsonResponse){
+        try{
+            // Преобразуем строку в JSONObject
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            // Форматируем JSON с отступами (4 пробела)
+
+            return jsonObject.toString(4);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return jsonResponse;
+        }
+    }
 
 }
