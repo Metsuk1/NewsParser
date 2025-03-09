@@ -30,7 +30,7 @@ public class NewsClient {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }finally{
+        }finally {
             if(connection != null){
                 connection.disconnect();
             }
